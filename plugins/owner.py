@@ -51,14 +51,14 @@ class Owner(commands.Cog):
             prefix = ''
 
 
-        if not id in self.bot.blacklist:
-            return await ctx.send(prefix + f'ID: {id} not in blacklist.')
+        if id not in self.bot.blacklist:
+            return await ctx.send(f'{prefix}ID: {id} not in blacklist.')
 
         self.bot.blacklist.remove(id)
 
         if prefix:
             await self.bot.db.set_in_user(id, 'blacklisted', False)
-            return await ctx.send(prefix + f'removed from blacklist.')
+            return await ctx.send(f'{prefix}removed from blacklist.')
 
         # We need to determine if the integer obtained is the id of a guild or a user we no longer see
 
@@ -134,7 +134,7 @@ class Owner(commands.Cog):
     @commands.command(hidden=True)
     async def cogupdate(self, ctx):
         """Fetches and update cogs from github repo"""
-        os.system(f'./cogupdate.sh')
+        os.system('./cogupdate.sh')
 
     @commands.command(hidden=True)
     async def restart(self, ctx):
@@ -175,9 +175,8 @@ class Owner(commands.Cog):
             'channel': ctx.channel,
             'author': ctx.author,
             'message': ctx.message,
-            '_': self._last_eval_result
-        }
-        env.update(globals())
+            '_': self._last_eval_result,
+        } | globals()
 
         code = self._clean_code(code)
         buffer = io.StringIO()

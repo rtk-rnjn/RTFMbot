@@ -15,7 +15,7 @@ async def python_doc(ctx, text: str):
     text = text.strip('`')
 
     url = "https://docs.python.org/3/genindex-all.html"
-    alphabet = '_' + ascii_uppercase
+    alphabet = f'_{ascii_uppercase}'
 
     async with aiohttp.ClientSession() as client_session:
         async with client_session.get(url) as response:
@@ -47,7 +47,8 @@ async def _cppreference(language, ctx, text: str):
 
     text = text.strip('`')
 
-    base_url = 'https://cppreference.com/w/cpp/index.php?title=Special:Search&search=' + text
+    base_url = f'https://cppreference.com/w/cpp/index.php?title=Special:Search&search={text}'
+
     url = urllib.parse.quote_plus(base_url, safe=';/?:@&=$,><-[]')
 
     async with aiohttp.ClientSession() as client_session:

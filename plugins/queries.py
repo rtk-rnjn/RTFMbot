@@ -44,7 +44,7 @@ class Coding(commands.Cog):
             siblings.append(elem.text)
         content = '\n'.join(siblings)
         if len(content) >= 1024:
-            content = content[:1021] + '...'
+            content = f'{content[:1021]}...'
 
         return content
 
@@ -69,7 +69,7 @@ class Coding(commands.Cog):
     }
 
     @commands.command(
-help='''run <language> [--wrapped] [--stats] <code>
+    help='''run <language> [--wrapped] [--stats] <code>
 
 for command-line-options, compiler-flags and arguments you may
 add a line starting with this argument, and after a space add
@@ -89,13 +89,18 @@ in a new hastebin and the link will be returned.
 
 When the code returns your output, you may delete it by clicking :wastebasket: in the following minute.
 Useful to hide your syntax fails or when you forgot to print the result.''',
-brief='Execute code in a given programming language'
+    brief='Execute code in a given programming language'
         )
     async def run(self, ctx, *, payload=''):
         """Execute code in a given programming language"""
 
         if not payload:
-            emb = discord.Embed(title='SyntaxError',description=f"Command `run` missing a required argument: `language`",colour=0xff0000)
+            emb = discord.Embed(
+                title='SyntaxError',
+                description="Command `run` missing a required argument: `language`",
+                colour=0xFF0000,
+            )
+
             return await ctx.send(embed=emb)
 
         no_rerun = True
@@ -168,7 +173,7 @@ brief='Execute code in a given programming language'
 
         lang = language.strip('`')
 
-        if not lang.lower() in self.referred:
+        if lang.lower() not in self.referred:
             return await ctx.send(f"{lang} not available. See `{self.bot.config['PREFIX']}list references` for available ones.")
 
         await self.referred[lang.lower()](ctx, query.strip('`'))
@@ -180,7 +185,7 @@ brief='Execute code in a given programming language'
 
         lang = language.strip('`')
 
-        if not lang.lower() in self.documented:
+        if lang.lower() not in self.documented:
             return await ctx.send(f"{lang} not available. See `{self.bot.config['PREFIX']}list documentations` for available ones.")
 
         await self.documented[lang.lower()](ctx, query.strip('`'))
@@ -230,7 +235,7 @@ brief='Execute code in a given programming language'
     async def stack(self, ctx, siteName, *, query: str):
         """Queries given StackExchange website and gives you top results. siteName is case-sensitive."""
 
-        if siteName[0].islower() or not siteName in dir(se):
+        if siteName[0].islower() or siteName not in dir(se):
             await ctx.send(f"{siteName} does not appear to be in the StackExchange network."
                 " Check the case and the spelling.")
 
@@ -238,8 +243,7 @@ brief='Execute code in a given programming language'
         site.impose_throttling = True
         site.throttle_stop = False
 
-        qs = site.search(intitle=query)[:3]
-        if qs:
+        if qs := site.search(intitle=query)[:3]:
             emb = discord.Embed(title=query)
             emb.set_thumbnail(url=f'http://s2.googleusercontent.com/s2/favicons?domain_url={site.domain}')
             emb.set_footer(text="Hover for vote stats")
@@ -268,11 +272,14 @@ brief='Execute code in a given programming language'
         }
 
         if group == 'languages':
-            emb = discord.Embed(title=f"Available for {group}: {len(self.bot.languages)}",
-                description=f'View them on [tio.run](https://tio.run/#), or in [JSON format](https://tio.run/languages.json)')
+            emb = discord.Embed(
+                title=f"Available for {group}: {len(self.bot.languages)}",
+                description='View them on [tio.run](https://tio.run/#), or in [JSON format](https://tio.run/languages.json)',
+            )
+
             return await ctx.send(embed=emb)
 
-        if not group in choices:
+        if group not in choices:
             emb = discord.Embed(title="Available listed commands", description=f"`languages`, `{'`, `'.join(choices)}`")
             return await ctx.send(embed=emb)
 

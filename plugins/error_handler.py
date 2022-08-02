@@ -22,7 +22,7 @@ class ErrorHandler(commands.Cog):
         if isinstance(error, commands.CommandInvokeError) and hasattr(error, 'original'):
             error = error.original
             raised = True
-        if isinstance(error, commands.CommandNotFound) or isinstance(error, commands.NotOwner):
+        if isinstance(error, (commands.CommandNotFound, commands.NotOwner)):
             return
         elif isinstance(error, commands.MissingRequiredArgument):
             name = "SyntaxError"
@@ -36,11 +36,10 @@ class ErrorHandler(commands.Cog):
         elif isinstance(error, commands.CheckFailure):
             name = "PermissionError"
             content = "Escalation failed: you are not in the sudoers file.\nThis incident will be reported"
-        elif isinstance(error, discord.Forbidden) or isinstance(error, discord.HTTPException):
+        elif isinstance(error, (discord.Forbidden, discord.HTTPException)):
             # We may not be able to send an embed or even send a message at this point
             bot_member = ctx.guild.get_member(self.bot.user.id)
-            can_talk = ctx.channel.permissions_for(bot_member).send_messages
-            if can_talk:
+            if can_talk := ctx.channel.permissions_for(bot_member).send_messages:
                 return await ctx.send(f"```An error occurred while responding:\n{error.code} - {error.text}\n\nI need following permissions:\n\nEmbed links\nAttach files\nAdd reactions```")
         elif isinstance(error, UnicodeError):
             name = "UnicodeError"

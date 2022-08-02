@@ -40,7 +40,7 @@ class Manage(commands.Cog):
 
         self.bot.prefixes[ctx.guild.id] = new_prefix
 
-        await self.bot.db.set_in_guild(ctx.guild.id, 'prefix', new_prefix+'.') # we add a non-whitespace char so Postgres doesn't trim
+        await self.bot.db.set_in_guild(ctx.guild.id, 'prefix', f'{new_prefix}.')
 
         await ctx.send(f'Prefix set to "{new_prefix}"')
 

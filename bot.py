@@ -17,10 +17,11 @@ extensions = (
 )
 
 def _prefix_callable(bot, message):
-    base = [f'<@!{bot.user.id}> ', f'<@{bot.user.id}> ']
-    base.append(bot.prefixes.get(message.guild.id) or bot.config['PREFIX'])
-
-    return base
+    return [
+        f'<@!{bot.user.id}> ',
+        f'<@{bot.user.id}> ',
+        bot.prefixes.get(message.guild.id) or bot.config['PREFIX'],
+    ]
 
 description = "A discord bot to help you in your daily programming discord life"
 
@@ -122,7 +123,7 @@ class RTFM(commands.AutoShardedBot):
 
     async def on_guild_remove(self, guild):
         # don't log departures from blacklisting
-        if not guild.id in self.blacklist:
+        if guild.id not in self.blacklist:
             await log_guilds(self, guild, False)
 
     async def close(self):

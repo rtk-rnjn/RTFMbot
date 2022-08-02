@@ -11,7 +11,7 @@ def _to_tio_string(couple):
     if not obj:
         return b''
     elif type(obj) == list:
-        content = ['V' + name, str(len(obj))] + obj
+        content = [f'V{name}', str(len(obj))] + obj
         return to_bytes('\x00'.join(content) + '\x00')
     else:
         return to_bytes(f"F{name}\x00{len(to_bytes(obj))}\x00{obj}\x00")

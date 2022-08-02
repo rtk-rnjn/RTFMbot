@@ -28,7 +28,12 @@ def prepare_payload(payload):
         language,text = re.split(r'\s+', payload, maxsplit=1)
     except ValueError:
         # single word : no code yet no file attached
-        emb = discord.Embed(title='SyntaxError',description=f"Command `run` missing a required argument: `code`",colour=0xff0000)
+        emb = discord.Embed(
+            title='SyntaxError',
+            description="Command `run` missing a required argument: `code`",
+            colour=0xFF0000,
+        )
+
         return ('', emb, True)
 
     return (language, text, False)
@@ -70,8 +75,12 @@ class RerunBtn(discord.ui.Button):
         if interaction.user.id != message.author.id:
             await interaction.response.send_message('Only the one who used the run command can use these buttons.', ephemeral=True)
 
-        prefixes = [f'<@!{self.bot.user.id}> ', f'<@{self.bot.user.id}> ']
-        prefixes.append(self.bot.prefixes.get(interaction.guild_id) or self.bot.config['PREFIX'])
+        prefixes = [
+            f'<@!{self.bot.user.id}> ',
+            f'<@{self.bot.user.id}> ',
+            self.bot.prefixes.get(interaction.guild_id)
+            or self.bot.config['PREFIX'],
+        ]
 
         payload = message.content
 
@@ -185,7 +194,7 @@ async def execute_run(bot, language, code, rerun=False) -> tuple:
 
     if lang in default_langs:
         lang = default_langs[lang]
-    if not lang in bot.languages:
+    if lang not in bot.languages:
         matches = []
         i = 0
         for language in bot.languages:
@@ -194,11 +203,9 @@ async def execute_run(bot, language, code, rerun=False) -> tuple:
                 i += 1
                 if i == 10:
                     break
-        matches = '\n'.join(matches)
-
         output = f"`{lang}` not available."
-        if matches:
-            output = output + f" Did you mean:\n{matches}"
+        if matches := '\n'.join(matches):
+            output = f"{output} Did you mean:\n{matches}"
 
         return output
 
@@ -265,24 +272,21 @@ def get_raw(link):
         'https://gist.githubusercontent.com'
     )
 
-    if not any([link.startswith(url) for url in authorized]):
+    if not any(link.startswith(url) for url in authorized):
         raise commands.BadArgument(message=f"I only accept links from {', '.join(authorized)}. (Starting with 'http').")
 
     domain = link.split('/')[2]
 
-    if domain == 'hastebin.com':
-        if '/raw/' in link:
-            return link
-        token = link.split('/')[-1]
-        if '.' in token:
-            token = token[:token.rfind('.')] # removes extension
-        return f'https://hastebin.com/raw/{token}'
-    else:
+    if domain != 'hastebin.com':
         # Github uses redirection so raw -> usercontent and no raw -> normal
         # We still need to ensure we get a raw version after this potential redirection
-        if '/raw' in link:
-            return link
-        return link + '/raw'
+        return link if '/raw' in link else f'{link}/raw'
+    if '/raw/' in link:
+        return link
+    token = link.split('/')[-1]
+    if '.' in token:
+        token = token[:token.rfind('.')] # removes extension
+    return f'https://hastebin.com/raw/{token}'
 
 async def paste(text):
     """Return an online bin of given text"""

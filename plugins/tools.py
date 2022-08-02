@@ -40,7 +40,7 @@ class Tools(commands.Cog):
         units = ('o', 'Kio', 'Mio', 'Gio', 'Tio', 'Pio', 'Eio', 'Zio', 'Yio')
         unit = unit.capitalize()
 
-        if not unit in units and unit != 'O':
+        if unit not in units and unit != 'O':
             return await ctx.send(f"Available units are `{'`, `'.join(units)}`.")
 
         emb = discord.Embed(title="Binary conversions")
@@ -62,10 +62,11 @@ class Tools(commands.Cog):
 
         algo = algorithm.lower()
 
-        if not algo in self.algos:
-            matches = '\n'.join([supported for supported in self.algos if algo in supported][:10])
+        if algo not in self.algos:
             message = f"`{algorithm}` not available."
-            if matches:
+            if matches := '\n'.join(
+                [supported for supported in self.algos if algo in supported][:10]
+            ):
                 message += f" Did you mean:\n{matches}"
             return await ctx.send(message)
 

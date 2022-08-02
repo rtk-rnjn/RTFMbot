@@ -37,12 +37,15 @@ class Background(commands.Cog):
         guildCount = len(self.bot.guilds)
         shardCount = self.bot.shard_count
 
-        lists_payloads = (p for p in [
-            {'server_count': guildCount, 'shard_count': shardCount},
-            {'server_count': guildCount},
-            {'guildCount':   guildCount, "shardCount": shardCount},
-            {'guilds':       guildCount}
-        ])
+        lists_payloads = iter(
+            [
+                {'server_count': guildCount, 'shard_count': shardCount},
+                {'server_count': guildCount},
+                {'guildCount': guildCount, "shardCount": shardCount},
+                {'guilds': guildCount},
+            ]
+        )
+
 
         for url, headers in self.lists_settings:
             await self.bot.session.post(url, data=next(lists_payloads), headers=headers)
